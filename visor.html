@@ -1,0 +1,39 @@
+﻿<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Visor de recurso</title>
+  <style>
+    body { margin:0; font-family:Segoe UI, Arial, sans-serif; background:#f8fafc; color:#1f2937; }
+    .top { padding:10px 14px; background:#fff; border-bottom:1px solid #dbe2ea; }
+    .msg { padding:8px 14px; background:#fff7ed; color:#9a3412; border-bottom:1px solid #fed7aa; display:none; }
+    iframe { width:100%; height:calc(100vh - 96px); border:0; background:#fff; }
+    a { color:#0b5cad; }
+  </style>
+</head>
+<body>
+  <div class="top">
+    <strong id="name">Recurso</strong> |
+    <a id="direct" href="#" target="_blank">Abrir directo</a> |
+    <a href="index.html">Volver al mockup</a>
+  </div>
+  <div class="msg" id="fallback">Si no carga en el visor, usa "Abrir directo". El recurso existe, pero el navegador puede bloquear embebido.</div>
+  <iframe id="frame" title="visor"></iframe>
+
+  <script>
+    const p = new URLSearchParams(location.search);
+    const file = p.get('f') ? decodeURIComponent(p.get('f')) : '';
+    document.getElementById('name').textContent = file || 'Sin recurso';
+    document.getElementById('direct').href = file || '#';
+    const frame = document.getElementById('frame');
+    if (file) {
+      frame.src = file;
+      setTimeout(() => { document.getElementById('fallback').style.display = 'block'; }, 1200);
+    } else {
+      document.getElementById('fallback').style.display = 'block';
+      frame.remove();
+    }
+  </script>
+</body>
+</html>

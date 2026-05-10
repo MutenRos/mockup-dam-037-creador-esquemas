@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SVG Draw + Zoom</title>
+
+<style>
+html,body{
+    margin:0;
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    background:#e8e8e8;
+}
+
+svg{
+    width:100vw;
+    height:100vh;
+    display:block;
+    background:white;
+    cursor:crosshair;
+    touch-action:none;
+}
+</style>
+</head>
+<body>
+
+<svg id="svg">
+    <g id="viewport"></g>
+</svg>
+
+<script>
+const svg = document.getElementById("svg");
+const viewport = document.getElementById("viewport");
+
+let drawing = false;
+let currentPath = null;
+let points = [];
+
+const MIN_DISTANCE = 6;
+
+let scale = 1;
+let offsetX = 0;
+let offsetY = 0;
+
+function updateTransform(){
+    viewport.setAttribute(
+        "transform",
+        `translate(${offsetX},${offsetY}) scale(${scale})`
+    );
+}
+
+function screenToWorld(x,y){
+    return {
+        x:(x - offsetX) / scale,
+        y:(y - offsetY) / scale
+    };
+}
+
+function getPoint(event){
+    const rect = svg.getBoundingClientRect();
+
+    return screenToWorld(
+        event.clientX - rect.left,
+        event.clientY - rect.top
+    );
+}
+
+function distance(a,b){
+    return Math.hypot(a.x - b.x, a.y - b.y);
+}
+
+function pointsToPath(points){
+    if(points.length < 2) return "";
+
+    let d = `M ${points[0].x} ${points[0].y}`;
+
+    for(let i=1;i<points.length-1;i++){
+
+        const p = points[i];
+        const n = points[i+1];
+
+        const mx = (p.x + n.x)/2;
+        const my = (p.y + n.y)/2;
+
+        d += ` Q ${p.x} ${p.y} ${mx} ${my}`;
+    }
+
+    const last = points[points.length-1];
+
+    d += ` L ${last.x} ${last.y}`;
+
+    return d;
+}
+
+function startDraw(event){
+
+    drawing = true;
+
+    points = [getPoint(event)];
+
+    currentPath = document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "path"
+    );
+
+    currentPath.setAttribute("fill","none");
+    currentPath.setAttribute("stroke","black");
+    currentPath.setAttribute("stroke-width","4");
+    currentPath.setAttribute("stroke-linecap","round");
+    currentPath.setAttribute("stroke-linejoin","round");
+
+    viewport.appendChild(currentPath);
+}
+
+function draw(event){
+
+    if(!drawing) return;
+
+    const p = getPoint(event);
+    const last = points[points.length-1];
+
+    if(distance(p,last) < MIN_DISTANCE) return;
+
+    points.push(p);
+
+    currentPath.setAttribute(
+        "d",
+        pointsToPath(points)
+    );
+}
+
+function stopDraw(){
+    drawing = false;
+    currentPath = null;
+    points = [];
+}
+
+svg.addEventListener("pointerdown",startDraw);
+svg.addEventListener("pointermove",draw);
+window.addEventListener("pointerup",stopDraw);
+
+svg.addEventListener("wheel",event=>{
+
+    event.preventDefault();
+
+    const rect = svg.getBoundingClientRect();
+
+    const mouseX = event.clientX - rect.left;
+    const mouseY = event.clientY - rect.top;
+
+    const worldX = (mouseX - offsetX) / scale;
+    const worldY = (mouseY - offsetY) / scale;
+
+    const zoom = event.deltaY < 0 ? 1.1 : 0.9;
+
+    scale *= zoom;
+
+    offsetX = mouseX - worldX * scale;
+    offsetY = mouseY - worldY * scale;
+
+    updateTransform();
+
+},{passive:false});
+
+updateTransform();
+</script>
+
+</body>
+</html>

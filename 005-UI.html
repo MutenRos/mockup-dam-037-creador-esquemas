@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>jocarsa | dibujo</title>
+
+<style>
+html,body{
+    margin:0;
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    background:#e8e8e8;
+    font-family:Ubuntu,Arial,sans-serif;
+}
+
+svg{
+    width:100vw;
+    height:100vh;
+    display:block;
+    background:white;
+    cursor:crosshair;
+    touch-action:none;
+}
+
+#ui{
+    position:fixed;
+    top:18px;
+    left:18px;
+    z-index:10;
+
+    display:flex;
+    align-items:center;
+    gap:14px;
+
+    padding:12px 14px;
+    border-radius:18px;
+
+    background:rgba(255,255,255,0.88);
+    backdrop-filter:blur(12px);
+    box-shadow:0 10px 35px rgba(0,0,0,0.16);
+
+    user-select:none;
+}
+
+#brand{
+    font-weight:700;
+    font-size:15px;
+    letter-spacing:0.3px;
+    white-space:nowrap;
+}
+
+#brand span{
+    font-weight:400;
+    opacity:0.65;
+}
+
+.group{
+    display:flex;
+    align-items:center;
+    gap:8px;
+}
+
+.label{
+    font-size:12px;
+    opacity:0.55;
+}
+
+.color-btn{
+    width:24px;
+    height:24px;
+    border-radius:50%;
+    border:2px solid white;
+    outline:1px solid rgba(0,0,0,0.2);
+    cursor:pointer;
+}
+
+.color-btn.active{
+    outline:3px solid black;
+}
+
+.width-btn{
+    width:34px;
+    height:26px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    border:0;
+    border-radius:999px;
+    background:#eee;
+    cursor:pointer;
+}
+
+.width-btn.active{
+    background:#111;
+}
+
+.width-dot{
+    display:block;
+    border-radius:50%;
+    background:#111;
+}
+
+.width-btn.active .width-dot{
+    background:white;
+}
+</style>
+</head>
+<body>
+
+<div id="ui">
+    <div id="brand">jocarsa <span>| dibujo</span></div>
+
+    <div class="group">
+        <div class="label">Color</div>
+        <button class="color-btn active" data-color="#111111" style="background:#111111"></button>
+        <button class="color-btn" data-color="#e63946" style="background:#e63946"></button>
+        <button class="color-btn" data-color="#2a9d8f" style="background:#2a9d8f"></button>
+        <button class="color-btn" data-color="#457b9d" style="background:#457b9d"></button>
+        <button class="color-btn" data-color="#f4a261" style="background:#f4a261"></button>
+        <input id="colorPicker" type="color" value="#111111">
+    </div>
+
+    <div class="group">
+        <div class="label">Width</div>
+        <button class="width-btn active" data-width="2">
+            <span class="width-dot" style="width:4px;height:4px"></span>
+        </button>
+        <button class="width-btn" data-width="4">
+            <span class="width-dot" style="width:7px;height:7px"></span>
+        </button>
+        <button class="width-btn" data-width="8">
+            <span class="width-dot" style="width:11px;height:11px"></span>
+        </button>
+        <button class="width-btn" data-width="14">
+            <span class="width-dot" style="width:16px;height:16px"></span>
+        </button>
+    </div>
+</div>
+
+<svg id="svg">
+    <g id="viewport"></g>
+</svg>
+
+<script>
+const svg = document.getElementById("svg");
+const viewport = document.getElementById("viewport");
+
+const colorButtons = document.querySelectorAll(".color-btn");
+const widthButtons = document.querySelectorAll(".width-btn");
+const colorPicker = document.getElementById("colorPicker");
+
+let drawing = false;
+let currentPath = null;
+let points = [];
+
+let currentColor = "#111111";
+let currentWidth = 2;
+
+const MIN_DISTANCE = 6;
+
+let scale = 1;
+let offsetX = 0;
+let offsetY = 0;
+
+function updateTransform(){
+    viewport.setAttribute(
+        "transform",
+        `translate(${offsetX},${offsetY}) scale(${scale})`
+    );
+}
+
+function screenToWorld(x,y){
+    return {
+        x:(x - offsetX) / scale,
+        y:(y - offsetY) / scale
+    };
+}
+
+function getPoint(event){
+    const rect = svg.getBoundingClientRect();
+
+    return screenToWorld(
+        event.clientX - rect.left,
+        event.clientY - rect.top
+    );
+}
+
+function distance(a,b){
+    return Math.hypot(a.x - b.x, a.y - b.y);
+}
+
+function pointsToPath(points){
+    if(points.length < 2) return "";
+
+    let d = `M ${points[0].x} ${points[0].y}`;
+
+    for(let i=1;i<points.length-1;i++){
+        const p = points[i];
+        const n = points[i+1];
+
+        const mx = (p.x + n.x)/2;
+        const my = (p.y + n.y)/2;
+
+        d += ` Q ${p.x} ${p.y} ${mx} ${my}`;
+    }
+
+    const last = points[points.length-1];
+
+    d += ` L ${last.x} ${last.y}`;
+
+    return d;
+}
+
+function startDraw(event){
+    if(event.target.closest("#ui")) return;
+
+    drawing = true;
+    points = [getPoint(event)];
+
+    currentPath = document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "path"
+    );
+
+    currentPath.setAttribute("fill","none");
+    currentPath.setAttribute("stroke",currentColor);
+    currentPath.setAttribute("stroke-width",currentWidth);
+    currentPath.setAttribute("stroke-linecap","round");
+    currentPath.setAttribute("stroke-linejoin","round");
+
+    viewport.appendChild(currentPath);
+}
+
+function draw(event){
+    if(!drawing) return;
+
+    const p = getPoint(event);
+    const last = points[points.length-1];
+
+    if(distance(p,last) < MIN_DISTANCE) return;
+
+    points.push(p);
+    currentPath.setAttribute("d",pointsToPath(points));
+}
+
+function stopDraw(){
+    drawing = false;
+    currentPath = null;
+    points = [];
+}
+
+function selectColor(color){
+    currentColor = color;
+    colorPicker.value = color;
+
+    colorButtons.forEach(btn=>{
+        btn.classList.toggle(
+            "active",
+            btn.dataset.color.toLowerCase() === color.toLowerCase()
+        );
+    });
+}
+
+function selectWidth(width){
+    currentWidth = Number(width);
+
+    widthButtons.forEach(btn=>{
+        btn.classList.toggle(
+            "active",
+            Number(btn.dataset.width) === currentWidth
+        );
+    });
+}
+
+colorButtons.forEach(btn=>{
+    btn.addEventListener("click",()=>{
+        selectColor(btn.dataset.color);
+    });
+});
+
+colorPicker.addEventListener("input",()=>{
+    currentColor = colorPicker.value;
+    colorButtons.forEach(btn=>btn.classList.remove("active"));
+});
+
+widthButtons.forEach(btn=>{
+    btn.addEventListener("click",()=>{
+        selectWidth(btn.dataset.width);
+    });
+});
+
+svg.addEventListener("pointerdown",startDraw);
+svg.addEventListener("pointermove",draw);
+window.addEventListener("pointerup",stopDraw);
+
+svg.addEventListener("wheel",event=>{
+    event.preventDefault();
+
+    const rect = svg.getBoundingClientRect();
+
+    const mouseX = event.clientX - rect.left;
+    const mouseY = event.clientY - rect.top;
+
+    const worldX = (mouseX - offsetX) / scale;
+    const worldY = (mouseY - offsetY) / scale;
+
+    const zoom = event.deltaY < 0 ? 1.1 : 0.9;
+
+    scale *= zoom;
+
+    offsetX = mouseX - worldX * scale;
+    offsetY = mouseY - worldY * scale;
+
+    updateTransform();
+
+},{passive:false});
+
+updateTransform();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Smooth SVG Draw</title>
+<style>
+html,body{
+    margin:0;
+    width:100%;
+    height:100%;
+    overflow:hidden;
+}
+svg{
+    width:100vw;
+    height:100vh;
+    display:block;
+    background:white;
+    cursor:crosshair;
+    touch-action:none;
+}
+</style>
+</head>
+<body>
+
+<svg id="canvas"></svg>
+
+<script>
+const svg = document.getElementById("canvas");
+
+let drawing = false;
+let currentPath = null;
+let points = [];
+
+const MIN_DISTANCE = 6;
+
+function getPoint(event){
+    const rect = svg.getBoundingClientRect();
+    return {
+        x: event.clientX - rect.left,
+        y: event.clientY - rect.top
+    };
+}
+
+function distance(a,b){
+    return Math.hypot(a.x - b.x, a.y - b.y);
+}
+
+function pointsToSmoothPath(points){
+    if(points.length < 2){
+        return "";
+    }
+
+    let d = `M ${points[0].x} ${points[0].y}`;
+
+    for(let i = 1; i < points.length - 1; i++){
+        const current = points[i];
+        const next = points[i + 1];
+
+        const midX = (current.x + next.x) / 2;
+        const midY = (current.y + next.y) / 2;
+
+        d += ` Q ${current.x} ${current.y} ${midX} ${midY}`;
+    }
+
+    const last = points[points.length - 1];
+    d += ` L ${last.x} ${last.y}`;
+
+    return d;
+}
+
+function startDraw(event){
+    drawing = true;
+    points = [getPoint(event)];
+
+    currentPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    currentPath.setAttribute("fill", "none");
+    currentPath.setAttribute("stroke", "black");
+    currentPath.setAttribute("stroke-width", "4");
+    currentPath.setAttribute("stroke-linecap", "round");
+    currentPath.setAttribute("stroke-linejoin", "round");
+
+    svg.appendChild(currentPath);
+}
+
+function draw(event){
+    if(!drawing) return;
+
+    const p = getPoint(event);
+    const last = points[points.length - 1];
+
+    if(distance(p,last) < MIN_DISTANCE){
+        return;
+    }
+
+    points.push(p);
+    currentPath.setAttribute("d", pointsToSmoothPath(points));
+}
+
+function stopDraw(){
+    drawing = false;
+    currentPath = null;
+    points = [];
+}
+
+svg.addEventListener("pointerdown", startDraw);
+svg.addEventListener("pointermove", draw);
+window.addEventListener("pointerup", stopDraw);
+</script>
+
+</body>
+</html>

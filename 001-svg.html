@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Simple SVG Demo</title>
+<style>
+body{
+    margin:0;
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:#f2f2f2;
+    font-family:Arial,sans-serif;
+}
+svg{
+    width:500px;
+    height:300px;
+    background:white;
+    border:1px solid #ccc;
+}
+</style>
+</head>
+<body>
+
+<svg viewBox="0 0 500 300">
+    <rect x="40" y="40" width="140" height="90" fill="royalblue" rx="12"/>
+    <circle cx="300" cy="90" r="50" fill="tomato"/>
+    <line x1="40" y1="200" x2="460" y2="200" stroke="black" stroke-width="4"/>
+    <text x="250" y="250" text-anchor="middle" font-size="28" fill="#333">
+        Hello SVG
+    </text>
+</svg>
+
+</body>
+</html>

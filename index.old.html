@@ -1,0 +1,122 @@
+﻿<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Mockup Proyecto 037 - Creador de esquemas</title>
+  <style>
+    :root { --bg:#f6f8fb; --card:#ffffff; --ink:#1f2937; --muted:#4b5563; --line:#dbe2ea; --accent:#0f766e; --accent2:#0b5cad; }
+    body { margin:0; font-family:Segoe UI, Arial, sans-serif; background:linear-gradient(180deg,#f6f8fb,#eaf0f8); color:var(--ink); }
+    .wrap { max-width:1100px; margin:0 auto; padding:24px; }
+    .hero { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:20px; box-shadow:0 8px 25px rgba(0,0,0,.06); }
+    h1 { margin:0 0 8px; font-size:1.6rem; }
+    h2 { margin:0 0 10px; font-size:1.15rem; }
+    .muted { color:var(--muted); }
+    .chips { display:flex; flex-wrap:wrap; gap:8px; margin:12px 0; }
+    .chip { background:#e6fffa; border:1px solid #99f6e4; color:#0f766e; border-radius:999px; padding:6px 10px; font-size:.85rem; }
+    .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:14px; margin-top:14px; }
+    .card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px; }
+    .kpis { display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:10px; margin-top:14px; }
+    .kpi { background:#f8fafc; border:1px solid var(--line); border-radius:10px; padding:10px; }
+    .kpi b { font-size:1.3rem; color:#0b5cad; }
+    .actions { display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
+    button { border:1px solid #99f6e4; background:#e6fffa; color:#0f766e; border-radius:8px; padding:8px 12px; cursor:pointer; }
+    button:hover { filter:brightness(.98); }
+    .feed { display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:10px; margin-top:8px; }
+    .item { border:1px solid var(--line); border-radius:10px; padding:10px; background:#fff; }
+    .item .tag { font-size:.75rem; color:#0f766e; background:#ecfeff; border:1px solid #a5f3fc; border-radius:999px; padding:2px 8px; }
+    .item p { margin:8px 0; font-size:.9rem; word-break:break-all; }
+    .item a { margin-right:10px; font-size:.9rem; }
+    ul { margin:8px 0 0 18px; padding:0; }
+    li { margin:6px 0; }
+    a { color:#0b5cad; text-decoration:none; }
+    a:hover { text-decoration:underline; }
+    .warn { background:#fff7ed; border:1px solid #fed7aa; color:#9a3412; padding:10px; border-radius:8px; margin-top:10px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="hero">
+      <h1>Proyecto 037: Creador de esquemas</h1>
+      <p class="muted">Editor de esquemas y diagramas con conectores, capas y export SVG/PNG</p>
+      <div class="chips">
+        <span class="chip">Mockup honesto</span>
+        <span class="chip">Evidencias reales</span>
+        <span class="chip">Capturas/Grabacion</span>
+      </div>
+      <p><strong>Stack:</strong> HTML | CSS | JavaScript | SVG</p>
+      <p><strong>Mejoras:</strong> Conectores ortogonales, capas y plantillas predefinidas</p>
+      <p>
+        <a href="https://github.com/MutenRos/dam-037-creador-esquemas" target="_blank">Repo codigo</a> |
+        <a href="https://github.com/MutenRos/mockup-dam-037-creador-esquemas" target="_blank">Repo mockup</a> |
+        <a href="https://mutenros.github.io/mockup-dam-037-creador-esquemas/" target="_blank">GitHub Pages</a>
+      </p>
+      <div class="kpis">
+        <div class="kpi"><div class="muted">Demos HTML</div><b>9</b></div>
+        <div class="kpi"><div class="muted">Docs/recursos</div><b>1</b></div>
+        <div class="kpi"><div class="muted">Total navegable</div><b>10</b></div>
+      </div>
+      <div class="actions">
+        <button id="otra">Cargar otra tanda</button>
+        <button id="recargar">Refrescar contenido</button>
+        <span id="build" class="chip"></span>
+      </div>
+      <div class="warn">Este mockup no pretende simular funcionalidades inexistentes. Solo muestra recursos reales del proyecto y enlaces verificables.</div>
+    </section>
+
+    <div class="grid">
+      <article class="card">
+        <h2>Novedades rotativas (cambian en cada refresh)</h2>
+        <div id="news"></div>
+      </article>
+
+      <article class="card">
+        <h2>Rutas de recursos (siempre disponibles)</h2>
+        <div id="feed" class="feed"></div>
+      </article>
+    </div>
+  </div>
+  <script>
+    const ITEMS = [{"path":"001-svg.html","kind":"demo","label":"001-svg.html"},{"path":"002-dibujar.html","kind":"demo","label":"002-dibujar.html"},{"path":"003-suavizado.html","kind":"demo","label":"003-suavizado.html"},{"path":"004-esquema svg.html","kind":"demo","label":"004-esquema svg.html"},{"path":"005-UI.html","kind":"demo","label":"005-UI.html"},{"path":"006-salvar.html","kind":"demo","label":"006-salvar.html"},{"path":"007-ahora quiero texto.html","kind":"demo","label":"007-ahora quiero texto.html"},{"path":"008-seleccionar.html","kind":"demo","label":"008-seleccionar.html"},{"path":"009-formas basicas.html","kind":"demo","label":"009-formas basicas.html"},{"path":"README.md","kind":"doc","label":"README.md"}];
+    const UPDATES = ["Se han indexado recursos reales del proyecto para demo grabable.","Se ha actualizado la portada para evitar pantallas vacias.","Se ha generado rotacion de contenido visible por refresco.","Se han enlazado evidencias tecnicas y documentos de soporte.","Se han preparado rutas de visor y acceso directo por recurso."];
+
+    function shuffle(arr) {
+      const a = arr.slice();
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    function pick(arr, n) { return shuffle(arr).slice(0, Math.min(n, arr.length)); }
+    function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+    function renderNews() {
+      const news = pick(UPDATES, 3).map((n) => '<li>' + esc(n) + '</li>').join('');
+      document.getElementById('news').innerHTML = '<ul>' + news + '</ul>';
+    }
+
+    function renderFeed() {
+      const block = document.getElementById('feed');
+      const selected = pick(ITEMS, 8);
+      block.innerHTML = selected.map((it) => {
+        const f = encodeURIComponent(it.path);
+        return '<div class="item">'
+          + '<span class="tag">' + esc(it.kind) + '</span>'
+          + '<p>' + esc(it.label) + '</p>'
+          + '<a href="visor.html?f=' + f + '" target="_blank">Abrir en visor</a>'
+          + '<a href="' + esc(it.path) + '" target="_blank">Abrir directo</a>'
+          + '</div>';
+      }).join('');
+    }
+
+    const token = 'Build ' + new Date().toLocaleString() + ' Â· lote ' + (Math.floor(Math.random()*9000)+1000);
+    document.getElementById('build').textContent = token;
+    document.getElementById('otra').addEventListener('click', renderFeed);
+    document.getElementById('recargar').addEventListener('click', () => location.reload());
+    renderNews();
+    renderFeed();
+  </script>
+</body>
+</html>

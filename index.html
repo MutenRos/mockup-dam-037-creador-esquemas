@@ -1,0 +1,103 @@
+﻿<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Proyecto 037 - Mockup funcional</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <h1>Proyecto 037: Creador de esquemas</h1>
+      <p>Editor de esquemas y diagramas con conectores, capas y export SVG/PNG</p>
+    </div>
+    <div class="badges">
+      <span class="badge">Mockup funcional</span>
+      <span class="badge">Grabacion lista</span>
+      <span class="badge" id="buildBadge">Build -</span>
+    </div>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab active" data-tab="overview">Overview</button>
+    <button class="tab" data-tab="demo">Demo</button>
+    <button class="tab" data-tab="activity">Activity</button>
+    <button class="tab" data-tab="assets">Assets</button>
+  </nav>
+
+  <main>
+    <section class="panel active" id="overview">
+      <div class="kpis" id="kpis"></div>
+      <div class="cards">
+        <article class="card">
+          <h2>Objetivo</h2>
+          <p>Editor de esquemas y diagramas con conectores, capas y export SVG/PNG</p>
+          <p><strong>Stack:</strong> HTML | CSS | JavaScript | SVG</p>
+          <p><strong>Mejoras:</strong> Conectores ortogonales, capas y plantillas predefinidas</p>
+        </article>
+        <article class="card">
+          <h2>Enlaces</h2>
+          <ul>
+            <li><a href="https://github.com/MutenRos/dam-037-creador-esquemas" target="_blank">Repo codigo</a></li>
+            <li><a href="https://github.com/MutenRos/mockup-dam-037-creador-esquemas" target="_blank">Repo mockup</a></li>
+            <li><a href="https://mutenros.github.io/mockup-dam-037-creador-esquemas/" target="_blank">GitHub Pages</a></li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section class="panel" id="demo">
+      <div class="actions">
+        <button id="btnGenerate">Generar contenido nuevo</button>
+        <button id="btnInsert">Insertar evento demo</button>
+        <button id="btnReset">Reset demo</button>
+      </div>
+
+      <div class="demo-grid">
+        <article class="card">
+          <h2>Pipeline</h2>
+          <ul id="pipeline"></ul>
+        </article>
+
+        <article class="card">
+          <h2>Simulador rapido</h2>
+          <form id="simForm">
+            <label>Entidad
+              <input type="text" name="entity" placeholder="cliente / documento / item" required />
+            </label>
+            <label>Accion
+              <input type="text" name="action" placeholder="creado / procesado / publicado" required />
+            </label>
+            <button type="submit">Ejecutar accion</button>
+          </form>
+          <table>
+            <thead><tr><th>Hora</th><th>Entidad</th><th>Accion</th></tr></thead>
+            <tbody id="simRows"></tbody>
+          </table>
+        </article>
+      </div>
+    </section>
+
+    <section class="panel" id="activity">
+      <article class="card">
+        <h2>Feed de actividad</h2>
+        <ul id="feed"></ul>
+      </article>
+    </section>
+
+    <section class="panel" id="assets">
+      <article class="card">
+        <h2>Recursos navegables</h2>
+        <p class="muted">Nada de pantallas en blanco: cada recurso se abre en visor o directo.</p>
+        <div id="assetList" class="asset-list"></div>
+      </article>
+    </section>
+  </main>
+
+  <script>
+    window.MOCKUP_DATA = {"num":"037","slug":"creador-esquemas","title":"Creador de esquemas","assets":[{"path":"001-svg.html"},{"path":"002-dibujar.html"},{"path":"003-suavizado.html"},{"path":"004-esquema svg.html"},{"path":"005-UI.html"},{"path":"006-salvar.html"},{"path":"007-ahora quiero texto.html"},{"path":"008-seleccionar.html"},{"path":"009-formas basicas.html"},{"path":"README.md"}],"baseEvents":["Se ha refrescado la vista del panel","Se ha generado una nueva tanda de resultados","Se ha simulado una accion de usuario","Se ha abierto un recurso del proyecto","Se han actualizado los indicadores"]};
+  </script>
+  <script src="app.js"></script>
+</body>
+</html>
